@@ -10,3 +10,7 @@ I plan in the future to implement an emote wheel that will allow users to select
 Emotes are sourced from openmoji.org and are free to use under the CC BY-SA 4.0 license
 
 This software is licensed under the BSD 2-Clause "Simplified" License 
+
+## Acknowledgements
+Thanks to Openmoji for existing and making the emotes
+Shout out to my boy Gerald for the idea
