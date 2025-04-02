@@ -16,7 +16,22 @@ import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.ImageUtil;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+
+class Emote {
+	private static short NUM_EMOTES = 0;
+	private short id;
+	private BufferedImage img;
+
+	Emote(String path) {
+		this.id = NUM_EMOTES++;
+		this.img = ImageUtil.loadImageResource(PartyEmotePlugin.class, path);
+	}
+
+	static int getNumEmotes() { return Emote.NUM_EMOTES; }
+	public BufferedImage getImage() {
+		return img;
+	}
+}
 
 @PluginDescriptor(
 	name = "Emotes"
@@ -94,7 +109,14 @@ public class PartyEmotePlugin extends Plugin
 	@Subscribe
 	public void onPartyEmoteUpdate(PartyEmoteUpdate event)
 	{
-		emoteOverlay.addEvent(new EmoteEvent(event.getPlayerId(), event.getEmoteId()));
+		int emoteId = event.getEmoteId();
+
+		// make sure the emote id we're receiving is within our loaded range
+		// (someone is using a newer version?)
+		if (emoteId > 0 && emoteId < Emote.getNumEmotes())
+		{
+			emoteOverlay.addEvent(new EmoteEvent(event.getPlayerId(), event.getEmoteId()));
+		}
 	}
 
 	@Provides
@@ -124,19 +146,4 @@ public class PartyEmotePlugin extends Plugin
 		public void hotkeyPressed() { useEmote(3); }
 	};
 
-}
-
-class Emote {
-	private static short NUM_EMOJIS = 0;
-	private short id;
-	private BufferedImage img;
-
-	Emote(String path) {
-		this.id = NUM_EMOJIS++;
-		this.img = ImageUtil.loadImageResource(PartyEmotePlugin.class, path);
-	}
-
-	public BufferedImage getImage() {
-		return img;
-	}
 }
