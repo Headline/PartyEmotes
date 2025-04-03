@@ -125,7 +125,7 @@ public class PartyEmotePlugin extends Plugin
 
 		// make sure the emote id we're receiving is within our loaded range
 		// (someone is using a newer version?)
-		if (emoteId > 0 && emoteId < Emote.getNumEmotes())
+		if (emoteId >= 0 && emoteId < Emote.getNumEmotes())
 		{
 			emoteOverlay.addEvent(new EmoteEvent(event.getPlayerId(), event.getEmoteId()));
 		}
