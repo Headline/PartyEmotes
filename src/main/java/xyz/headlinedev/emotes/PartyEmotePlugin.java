@@ -34,7 +34,7 @@ class Emote {
 }
 
 @PluginDescriptor(
-	name = "Emotes"
+	name = "Party Emotes"
 )
 public class PartyEmotePlugin extends Plugin
 {
