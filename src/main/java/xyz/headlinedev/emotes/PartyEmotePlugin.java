@@ -38,6 +38,7 @@ class Emote {
 )
 public class PartyEmotePlugin extends Plugin
 {
+	public static final int EMOTE_COOLDOWN_TICKS = 3;
 	@Inject
 	private Client client;
 
@@ -60,6 +61,8 @@ public class PartyEmotePlugin extends Plugin
 	private WSClient wsClient;
 
 	private Emote[] emotes;
+
+	private int lastSendTick;
 
 	@Override
 	protected void startUp() throws Exception
@@ -97,6 +100,15 @@ public class PartyEmotePlugin extends Plugin
 
 	protected void useEmote(int emoteId)
 	{
+		final int currentTick = client.getTickCount();
+		// prevent too much emote spam
+		if (lastSendTick + EMOTE_COOLDOWN_TICKS > currentTick)
+		{
+			return;
+		}
+
+		lastSendTick = currentTick;
+
 		final int localPlayerId = client.getLocalPlayer().getId();
 		emoteOverlay.addEvent(new EmoteEvent(localPlayerId, emoteId));
 		if (party.isInParty())
