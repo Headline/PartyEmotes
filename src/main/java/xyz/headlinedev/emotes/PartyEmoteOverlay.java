@@ -49,12 +49,11 @@ class EmoteEvent {
 public class PartyEmoteOverlay extends Overlay
 {
     private Client client;
-
     private Emote[] emojis;
-
     private final HashMap<Integer, EmoteEvent> activeEmotes;
-
     private Instant lastUpdate;
+    private PartyEmoteConfig config;
+
     @Inject
     private PartyEmoteOverlay()
     {
@@ -62,6 +61,7 @@ public class PartyEmoteOverlay extends Overlay
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(0.2f);
         lastUpdate = Instant.now();
+        this.config = null;
     }
 
     public void addEvent(EmoteEvent event)
@@ -101,28 +101,28 @@ public class PartyEmoteOverlay extends Overlay
     {
         final LocalPoint actorPosition = actor.getLocalLocation();
         final int offset = actor.getLogicalHeight() + 75;
-        BufferedImage sourceImg = this.emojis[event.emojiId].getImage();
-        BufferedImage img = ImageUtil.resizeCanvas(sourceImg, sourceImg.getWidth(), sourceImg.getHeight());
+        BufferedImage image = this.emojis[event.emojiId].getImage();
 
         // Fade emote out
         if (event.GetMillisLeft() < EmoteEvent.FADE_OUT_TIME_MS)
         {
-            BufferedImage newImage = new BufferedImage(sourceImg.getWidth(), sourceImg.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage alphaImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
             float alpha = event.GetMillisLeft() / (float) EmoteEvent.FADE_OUT_TIME_MS;
 
-            Graphics2D g2d = newImage.createGraphics();
+            Graphics2D g2d = alphaImage.createGraphics();
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-            g2d.drawImage(sourceImg, 0, 0, null);
+            g2d.drawImage(image, 0, 0, null);
             g2d.dispose();
 
-            img = newImage;
+            image = alphaImage;
         }
 
-        final Point imageLoc = Perspective.getCanvasImageLocation(client, actorPosition, img, offset);
+        BufferedImage resizedImage = ImageUtil.resizeCanvas(image, 50, 50);
+        final Point imageLoc = Perspective.getCanvasImageLocation(client, actorPosition, resizedImage, offset);
         if (imageLoc == null)
             return;
 
-        OverlayUtil.renderImageLocation(graphics, imageLoc, img);
+        OverlayUtil.renderImageLocation(graphics, imageLoc, resizedImage);
     }
 
     public void setClient(Client client) {
@@ -131,5 +131,9 @@ public class PartyEmoteOverlay extends Overlay
 
     public void setEmotes(Emote[]  emojis) {
         this.emojis = emojis;
+    }
+
+    public void setConfig(PartyEmoteConfig config) {
+        this.config = config;
     }
 }
